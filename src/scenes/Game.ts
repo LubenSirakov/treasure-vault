@@ -26,14 +26,17 @@ export default class Game extends Scene {
     this.player.x = window.innerWidth / 2;
     this.player.y = window.innerHeight - this.player.height / 3;
 
-    this.door.x = window.innerWidth / 2 + 10;
-    this.door.y = window.innerHeight - this.door.height + 75;
+    // Door
+    this.door.x = window.innerWidth / 2 + 20;
+    this.door.y = window.innerHeight / 2 - 10;
 
+    // Door open
     this.doorOpen.x = window.innerWidth / 2;
     this.doorOpen.y = window.innerHeight - this.doorOpen.height;
 
-    this.handle.x = window.innerWidth / 2 - 10;
-    this.handle.y = window.innerHeight - this.handle.height * 1.8;
+    // Handle
+    this.handle.x = window.innerWidth / 2;
+    this.handle.y = window.innerHeight / 2 - 10;
 
     this.background.initPlayerMovement(this.player);
 
@@ -65,12 +68,17 @@ export default class Game extends Scene {
     }
 
     if (this.door) {
-      this.door.x = width / 2;
-      this.door.y = height - this.door.height + 75;
+      this.door.x = window.innerWidth / 2 + 20;
+      this.door.y = window.innerHeight / 2 - 10;
+    }
+
+    if (this.handle) {
+      this.handle.x = window.innerWidth / 2;
+      this.handle.y = window.innerHeight / 2 - 10;
     }
 
     if (this.background) {
-      this.background.resize(width, height);
+      this.background.resize(window.innerWidth, window.innerHeight);
     }
   }
 }

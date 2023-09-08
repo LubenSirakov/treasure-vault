@@ -28,16 +28,15 @@ export default class Background extends Container {
   init() {
     for (const layer of this.config.layers) {
       const texture = Texture.from(layer);
-      const scaleFactorWidth = window.innerWidth / texture.width;
-      const scaleFactorHeight = window.innerHeight / texture.height;
+      const scaleFactor = window.innerHeight / texture.height;
 
       const tilingSprite = new TilingSprite(
         texture,
-        window.innerWidth / scaleFactorWidth,
+        texture.width,
         texture.height
       );
 
-      tilingSprite.scale.set(scaleFactorWidth, scaleFactorHeight);
+      tilingSprite.scale.set(scaleFactor);
       tilingSprite.name = layer;
       tilingSprite.anchor.set(0.5);
 

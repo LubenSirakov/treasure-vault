@@ -27,7 +27,10 @@ export default {
   },
   handles: {
     handle: {
-      layers: ["handleShadow", "handle"],
+      layers: [
+        // "handleShadow",
+        "handle",
+      ],
       panSpeed: 0.2,
     },
   },
