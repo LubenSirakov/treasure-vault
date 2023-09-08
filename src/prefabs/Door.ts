@@ -1,6 +1,4 @@
-import { Container, Sprite, Texture, TilingSprite } from "pixi.js";
-import Keyboard from "../core/Keyboard";
-import SpritesheetAnimation from "../core/SpritesheetAnimation";
+import { Container, Texture, TilingSprite } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 
 export type DoorConfig = {

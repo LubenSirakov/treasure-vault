@@ -1,10 +1,11 @@
 import config from "../config";
 import { Player } from "../prefabs/Player";
 import Scene from "../core/Scene";
-import SpineAnimation from "../core/SpineAnimation";
 import Background from "../prefabs/Background";
 import { Door } from "../prefabs/Door";
 import { Handle } from "../prefabs/Handle";
+import { Graphics } from "pixi.js";
+import gsap from "gsap";
 
 export default class Game extends Scene {
   name = "Game";
@@ -14,6 +15,7 @@ export default class Game extends Scene {
   private doorOpen!: Door;
   private handle!: Handle;
   private background!: Background;
+  private isSpinning: boolean = false;
 
   load() {
     this.background = new Background(config.backgrounds.vault);
@@ -35,6 +37,8 @@ export default class Game extends Scene {
     this.doorOpen.y = window.innerHeight - this.doorOpen.height;
 
     // Handle
+    this.handle.eventMode = "static";
+    this.handle.cursor = "pointer";
     this.handle.x = window.innerWidth / 2;
     this.handle.y = window.innerHeight / 2 - 10;
 
@@ -49,16 +53,61 @@ export default class Game extends Scene {
     );
   }
 
+  private setupInteractions() {
+    const leftSide = new Graphics()
+      .beginFill(0xffffff, 0.1)
+      .drawRect(0, 0, window.innerWidth / 2, window.innerHeight)
+      .endFill();
+    leftSide.interactive = true;
+    leftSide.cursor = "poiner";
+    leftSide.on("pointerdown", this.spinCounterclockwise.bind(this));
+
+    const rightSide = new Graphics()
+      .beginFill(0xff0000, 0.1) // TODO: Relplace color with 0xffffff
+      .drawRect(
+        window.innerWidth / 2,
+        0,
+        window.innerWidth / 2,
+        window.innerHeight
+      )
+      .endFill();
+    rightSide.interactive = true;
+    rightSide.cursor = "pointer";
+    rightSide.on("pointerdown", this.spinClockwise.bind(this));
+
+    this.addChild(leftSide, rightSide);
+  }
+
+  private spinClockwise() {
+    console.log("spinClockwise");
+    if (!this.isSpinning) {
+      gsap.to(this.handle, {
+        rotation: this.handle.rotation + Math.PI * 0.5,
+        duration: 1,
+        onComplete: () => {
+          // this.isSpinning = false;
+        },
+      });
+      // this.isSpinning = true;
+    }
+  }
+
+  private spinCounterclockwise() {
+    console.log("spinCounterclockwise");
+    if (!this.isSpinning) {
+      gsap.to(this.handle, {
+        rotation: this.handle.rotation - Math.PI * 0.5,
+        duration: 1,
+        onComplete: () => {
+          // this.isSpinning = false;
+        },
+      });
+      // this.isSpinning = true;
+    }
+  }
+
   async start() {
-    // Example of how to play a spine animation
-    // const vine = new SpineAnimation("vine-pro");
-    // vine.stateData.setMix("grow", "grow", 0.5);
-    // vine.x = 0;
-    // vine.y = window.innerHeight / 2 - 50;
-    // this.background.addChild(vine);
-    // while (vine) {
-    //   await vine.play("grow");
-    // }
+    this.setupInteractions();
   }
 
   onResize(width: number, height: number) {

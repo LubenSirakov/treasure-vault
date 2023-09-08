@@ -1,4 +1,4 @@
-import { Container, Texture, TilingSprite } from "pixi.js";
+import { Container, Graphics, Texture, TilingSprite } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 
 export type HandleConfig = {
@@ -6,16 +6,17 @@ export type HandleConfig = {
   panSpeed: number;
 };
 
-enum Directions {
-  CLOCKWISE = 1,
-  COUNTERCLOCKWISE = -1,
-}
-
 export class Handle extends Container {
   name = "Handle";
 
   layers: string[] = [];
   tilingSprites: TilingSprite[] = [];
+  dragTarget: TilingSprite | null = null;
+
+  state = {
+    idle: true,
+    spinning: false,
+  };
 
   constructor(
     protected config: HandleConfig = {
@@ -50,6 +51,4 @@ export class Handle extends Container {
       this.addChild(tilingSprite);
     }
   }
-
-  onClick() {}
 }
