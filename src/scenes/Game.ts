@@ -6,6 +6,7 @@ import { Handle } from "../prefabs/Handle";
 import { Graphics } from "pixi.js";
 import gsap from "gsap";
 import { generateVaultCombination } from "../utils/combinationGenerator";
+import { Blink } from "../prefabs/Blink";
 
 type CombinationPair = {
   number: number;
@@ -17,9 +18,12 @@ export default class Game extends Scene {
 
   private door!: Door;
   private doorOpen!: Door;
+  private doorOpenShadow!: Door;
   private handle!: Handle;
+  private handleShadow!: Handle;
   private background!: Background;
-  private isSpinning: boolean = false;
+  private blink!: Blink;
+
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
   private debounceTime: number = 1000; // Adjust the debounce time in milliseconds
@@ -33,15 +37,21 @@ export default class Game extends Scene {
 
     this.door = new Door(config.doors.closedDoor);
     this.doorOpen = new Door(config.doors.openedDoor);
+    this.doorOpenShadow = new Door(config.doors.doorOpenShadow);
     this.handle = new Handle(config.handles.handle);
+    this.handleShadow = new Handle(config.handles.handleShadow);
 
     // Door
     this.door.x = window.innerWidth / 2 + 20;
     this.door.y = window.innerHeight / 2 - 10;
 
     // Door open
-    this.doorOpen.x = window.innerWidth / 1.3;
+    this.doorOpen.x = window.innerWidth / 2 + this.door.width / 1.4;
     this.doorOpen.y = window.innerHeight / 2;
+
+    // Door open shadow
+    this.doorOpenShadow.x = window.innerWidth / 2 + this.door.width / 1.4 + 20;
+    this.doorOpenShadow.y = window.innerHeight / 2 + 20;
 
     // Handle
     this.handle.eventMode = "static";
@@ -49,7 +59,11 @@ export default class Game extends Scene {
     this.handle.x = window.innerWidth / 2;
     this.handle.y = window.innerHeight / 2 - 10;
 
-    this.addChild(this.background, this.door, this.handle);
+    // Handle shadow
+    this.handleShadow.x = window.innerWidth / 2 + 10;
+    this.handleShadow.y = window.innerHeight / 2 - 10;
+
+    this.addChild(this.background, this.door, this.handleShadow, this.handle);
   }
 
   private setupInteractions() {
@@ -85,6 +99,12 @@ export default class Game extends Scene {
       duration: 1,
       onComplete: () => {},
     });
+
+    gsap.to(this.handleShadow, {
+      rotation: this.handleShadow.rotation + Math.PI * 0.5,
+      duration: 1,
+      onComplete: () => {},
+    });
     this.onTap("clockwise");
   }
 
@@ -96,12 +116,23 @@ export default class Game extends Scene {
       duration: 1,
       onComplete: () => {},
     });
+
+    gsap.to(this.handleShadow, {
+      rotation: this.handleShadow.rotation - Math.PI * 0.5,
+      duration: 1,
+      onComplete: () => {},
+    });
     this.onTap("counterclockwise");
   }
 
   private crazyHandleSpin() {
     gsap.to(this.handle, {
       rotation: this.handle.rotation + Math.PI * 4,
+      duration: 1,
+    });
+
+    gsap.to(this.handleShadow, {
+      rotation: this.handleShadow.rotation + Math.PI * 4,
       duration: 1,
     });
   }
@@ -147,8 +178,12 @@ export default class Game extends Scene {
 
     if (this.isWinner) {
       console.log("Winner!");
-      this.removeChild(this.handle, this.door);
-      this.addChild(this.doorOpen);
+      this.removeChild(this.handle, this.handleShadow, this.door);
+      this.addChild(this.doorOpenShadow, this.doorOpen);
+
+      this.blink = new Blink(config.blink.blink);
+      this.addChild(this.blink);
+
       setTimeout(() => {
         this.crazyHandleSpin();
         this.restartGame();
@@ -172,8 +207,9 @@ export default class Game extends Scene {
   }
 
   restartGame() {
-    this.removeChild(this.doorOpen);
-    this.addChild(this.door, this.handle);
+    this.removeChild(this.blink, this.doorOpen, this.doorOpenShadow);
+    this.addChild(this.door, this.handleShadow, this.handle);
+
     this.vaultCombination = [];
     this.currentCombination = { number: 0, direction: null };
     this.userEnteredCombination = [];

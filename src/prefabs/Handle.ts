@@ -42,7 +42,7 @@ export class Handle extends Container {
         texture.height
       );
 
-      tilingSprite.scale.set(scaleFactor / 3.5); // Scale the sprite based on the height scale factor
+      tilingSprite.scale.set(scaleFactor / 3.7); // Scale the sprite based on the height scale factor
       tilingSprite.name = layer;
       tilingSprite.anchor.set(0.5);
 
