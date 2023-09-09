@@ -1,4 +1,4 @@
-import { Container, Graphics, Texture, TilingSprite } from "pixi.js";
+import { Container, Texture, TilingSprite } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 
 export type HandleConfig = {
