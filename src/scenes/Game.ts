@@ -20,6 +20,7 @@ export default class Game extends Scene {
   private handle!: Handle;
   private background!: Background;
   private isSpinning: boolean = false;
+  private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
   private debounceTime: number = 1000; // Adjust the debounce time in milliseconds
   private debounceTimer: number | undefined;
@@ -39,8 +40,8 @@ export default class Game extends Scene {
     this.door.y = window.innerHeight / 2 - 10;
 
     // Door open
-    this.doorOpen.x = window.innerWidth / 2;
-    this.doorOpen.y = window.innerHeight - this.doorOpen.height;
+    this.doorOpen.x = window.innerWidth / 1.3;
+    this.doorOpen.y = window.innerHeight / 2;
 
     // Handle
     this.handle.eventMode = "static";
@@ -48,12 +49,7 @@ export default class Game extends Scene {
     this.handle.x = window.innerWidth / 2;
     this.handle.y = window.innerHeight / 2 - 10;
 
-    this.addChild(
-      this.background,
-      this.door,
-      // this.doorOpen,
-      this.handle
-    );
+    this.addChild(this.background, this.door, this.handle);
   }
 
   private setupInteractions() {
@@ -82,34 +78,32 @@ export default class Game extends Scene {
   }
 
   private spinClockwise() {
-    console.log("spinClockwise");
+    console.log("spin Clockwise");
 
-    // if (!this.isSpinning) {
     gsap.to(this.handle, {
       rotation: this.handle.rotation + Math.PI * 0.5,
       duration: 1,
-      onComplete: () => {
-        // this.isSpinning = false;
-      },
+      onComplete: () => {},
     });
     this.onTap("clockwise");
-    // this.isSpinning = true;
-    // }
   }
 
   private spinCounterclockwise() {
-    console.log("spinCounterclockwise");
-    // if (!this.isSpinning) {
+    console.log("spin Counterclockwise");
+
     gsap.to(this.handle, {
       rotation: this.handle.rotation - Math.PI * 0.5,
       duration: 1,
-      onComplete: () => {
-        // this.isSpinning = false;
-      },
+      onComplete: () => {},
     });
     this.onTap("counterclockwise");
-    // this.isSpinning = true;
-    // }
+  }
+
+  private crazyHandleSpin() {
+    gsap.to(this.handle, {
+      rotation: this.handle.rotation + Math.PI * 4,
+      duration: 1,
+    });
   }
 
   private onTap(direction: "clockwise" | "counterclockwise") {
@@ -141,19 +135,28 @@ export default class Game extends Scene {
         currentPair.number !== this.vaultCombination[i].number ||
         currentPair.direction !== this.vaultCombination[i].direction
       ) {
-        console.log("Error brat me!");
-
+        console.log("Game over!");
         // Game should reset and handle should spin
+        this.crazyHandleSpin();
+        this.restartGame();
+      } else {
+        console.log("Correct! currentPair:", currentPair);
+        this.isWinner = i === this.vaultCombination.length - 1;
       }
-      console.log("currentPair", currentPair);
     }
 
-    // const isCorrect =
+    if (this.isWinner) {
+      console.log("Winner!");
+      this.removeChild(this.handle, this.door);
+      this.addChild(this.doorOpen);
+      setTimeout(() => {
+        this.crazyHandleSpin();
+        this.restartGame();
+      }, 5000);
+    }
   }
 
-  async start() {
-    this.setupInteractions();
-
+  getVaultCombination() {
     const vaultCombination = generateVaultCombination();
     vaultCombination.forEach((pair) => {
       const [number, direction] = pair.split(" ");
@@ -161,7 +164,22 @@ export default class Game extends Scene {
     });
 
     console.log(`Vault Combination: ${vaultCombination.join(", ")}`);
-    console.log("this.vaultCombination", this.vaultCombination);
+  }
+
+  async start() {
+    this.setupInteractions();
+    this.getVaultCombination();
+  }
+
+  restartGame() {
+    this.removeChild(this.doorOpen);
+    this.addChild(this.door, this.handle);
+    this.vaultCombination = [];
+    this.currentCombination = { number: 0, direction: null };
+    this.userEnteredCombination = [];
+    this.isWinner = false;
+
+    this.getVaultCombination();
   }
 
   onResize(width: number, height: number) {
@@ -173,6 +191,11 @@ export default class Game extends Scene {
     if (this.handle) {
       this.handle.x = window.innerWidth / 2;
       this.handle.y = window.innerHeight / 2 - 10;
+    }
+
+    if (this.doorOpen) {
+      this.doorOpen.x = window.innerWidth / 1.3;
+      this.doorOpen.y = window.innerHeight / 2;
     }
 
     if (this.background) {
