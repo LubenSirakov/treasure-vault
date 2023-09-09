@@ -1,32 +1,38 @@
 import config from "../config";
-import { Player } from "../prefabs/Player";
 import Scene from "../core/Scene";
 import Background from "../prefabs/Background";
 import { Door } from "../prefabs/Door";
 import { Handle } from "../prefabs/Handle";
 import { Graphics } from "pixi.js";
 import gsap from "gsap";
+import { generateVaultCombination } from "../utils/combinationGenerator";
+
+type CombinationPair = {
+  number: number;
+  direction: string | null;
+};
 
 export default class Game extends Scene {
   name = "Game";
 
-  private player!: Player;
   private door!: Door;
   private doorOpen!: Door;
   private handle!: Handle;
   private background!: Background;
   private isSpinning: boolean = false;
+  private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
+  private debounceTime: number = 1000; // Adjust the debounce time in milliseconds
+  private debounceTimer: number | undefined;
+  private vaultCombination: CombinationPair[] = [];
+  private currentCombination: CombinationPair = { number: 0, direction: null };
+  private userEnteredCombination: CombinationPair[] = [];
 
   load() {
     this.background = new Background(config.backgrounds.vault);
-    this.player = new Player();
 
     this.door = new Door(config.doors.closedDoor);
     this.doorOpen = new Door(config.doors.openedDoor);
     this.handle = new Handle(config.handles.handle);
-
-    this.player.x = window.innerWidth / 2;
-    this.player.y = window.innerHeight - this.player.height / 3;
 
     // Door
     this.door.x = window.innerWidth / 2 + 20;
@@ -42,11 +48,8 @@ export default class Game extends Scene {
     this.handle.x = window.innerWidth / 2;
     this.handle.y = window.innerHeight / 2 - 10;
 
-    this.background.initPlayerMovement(this.player);
-
     this.addChild(
       this.background,
-      // this.player,
       this.door,
       // this.doorOpen,
       this.handle
@@ -60,7 +63,7 @@ export default class Game extends Scene {
       .endFill();
     leftSide.interactive = true;
     leftSide.cursor = "poiner";
-    leftSide.on("pointerdown", this.spinCounterclockwise.bind(this));
+    leftSide.on("pointerdown", this.spinCounterclockwise, this);
 
     const rightSide = new Graphics()
       .beginFill(0xff0000, 0.1) // TODO: Relplace color with 0xffffff
@@ -73,49 +76,95 @@ export default class Game extends Scene {
       .endFill();
     rightSide.interactive = true;
     rightSide.cursor = "pointer";
-    rightSide.on("pointerdown", this.spinClockwise.bind(this));
+    rightSide.on("pointerdown", this.spinClockwise, this);
 
     this.addChild(leftSide, rightSide);
   }
 
   private spinClockwise() {
     console.log("spinClockwise");
-    if (!this.isSpinning) {
-      gsap.to(this.handle, {
-        rotation: this.handle.rotation + Math.PI * 0.5,
-        duration: 1,
-        onComplete: () => {
-          // this.isSpinning = false;
-        },
-      });
-      // this.isSpinning = true;
-    }
+
+    // if (!this.isSpinning) {
+    gsap.to(this.handle, {
+      rotation: this.handle.rotation + Math.PI * 0.5,
+      duration: 1,
+      onComplete: () => {
+        // this.isSpinning = false;
+      },
+    });
+    this.onTap("clockwise");
+    // this.isSpinning = true;
+    // }
   }
 
   private spinCounterclockwise() {
     console.log("spinCounterclockwise");
-    if (!this.isSpinning) {
-      gsap.to(this.handle, {
-        rotation: this.handle.rotation - Math.PI * 0.5,
-        duration: 1,
-        onComplete: () => {
-          // this.isSpinning = false;
-        },
-      });
-      // this.isSpinning = true;
+    // if (!this.isSpinning) {
+    gsap.to(this.handle, {
+      rotation: this.handle.rotation - Math.PI * 0.5,
+      duration: 1,
+      onComplete: () => {
+        // this.isSpinning = false;
+      },
+    });
+    this.onTap("counterclockwise");
+    // this.isSpinning = true;
+    // }
+  }
+
+  private onTap(direction: "clockwise" | "counterclockwise") {
+    if (
+      direction === this.lastTapDirection &&
+      this.currentCombination.direction !== null
+    ) {
+      this.currentCombination.number++;
+    } else {
+      this.lastTapDirection = direction;
+
+      this.currentCombination.number = 1;
+      this.currentCombination.direction = direction;
     }
+
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      this.userEnteredCombination.push(this.currentCombination);
+      this.currentCombination = { number: 0, direction: null };
+      this.checkCombination();
+    }, this.debounceTime);
+  }
+
+  private checkCombination() {
+    for (let i = 0; i < this.userEnteredCombination.length; i++) {
+      const currentPair = this.userEnteredCombination[i];
+
+      if (
+        currentPair.number !== this.vaultCombination[i].number ||
+        currentPair.direction !== this.vaultCombination[i].direction
+      ) {
+        console.log("Error brat me!");
+
+        // Game should reset and handle should spin
+      }
+      console.log("currentPair", currentPair);
+    }
+
+    // const isCorrect =
   }
 
   async start() {
     this.setupInteractions();
+
+    const vaultCombination = generateVaultCombination();
+    vaultCombination.forEach((pair) => {
+      const [number, direction] = pair.split(" ");
+      this.vaultCombination.push({ number: Number(number), direction });
+    });
+
+    console.log(`Vault Combination: ${vaultCombination.join(", ")}`);
+    console.log("this.vaultCombination", this.vaultCombination);
   }
 
   onResize(width: number, height: number) {
-    if (this.player) {
-      this.player.x = width / 2;
-      this.player.y = height - this.player.height / 3;
-    }
-
     if (this.door) {
       this.door.x = window.innerWidth / 2 + 20;
       this.door.y = window.innerHeight / 2 - 10;
