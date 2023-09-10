@@ -9,6 +9,7 @@
     "lint": "eslint ./src --fix"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.8",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "eslint": "^8.32.0",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@pixi/sound": "^5.2.0",
     "gsap": "^3.11.4",
+    "howler": "^2.2.3",
     "pixi-spine": "^4.0.4",
     "pixi.js": "^7.2.4"
   }

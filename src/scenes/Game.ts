@@ -26,6 +26,9 @@ export default class Game extends Scene {
   private blink!: Blink;
   private timerText!: Text;
   private timer!: Timer;
+  private themeSong!: Howl;
+  private winSound!: Howl;
+  private vaultCloseSound!: Howl;
 
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
@@ -43,6 +46,23 @@ export default class Game extends Scene {
     this.doorOpenShadow = new Door(config.doors.doorOpenShadow);
     this.handle = new Handle(config.handles.handle);
     this.handleShadow = new Handle(config.handles.handleShadow);
+
+    this.themeSong = new Howl({
+      src: ["public/Game/sounds/theme-song.mp3"],
+      volume: 0.8,
+      loop: true,
+    });
+
+    this.winSound = new Howl({
+      src: ["public/Game/sounds/win.mp3"],
+      volume: 1.0,
+      loop: true,
+    });
+
+    this.vaultCloseSound = new Howl({
+      src: ["public/Game/sounds/vault-close.mp3"],
+      volume: 0.8,
+    });
 
     const style = new TextStyle({
       fontFamily: "Arial",
@@ -98,7 +118,7 @@ export default class Game extends Scene {
 
   private setupInteractions() {
     const leftSide = new Graphics()
-      .beginFill(0xffffff, 0.1)
+      .beginFill(0xffffff, 0.01)
       .drawRect(0, 0, window.innerWidth / 2, window.innerHeight)
       .endFill();
     leftSide.interactive = true;
@@ -106,7 +126,7 @@ export default class Game extends Scene {
     leftSide.on("pointerdown", this.onCounterclockwiseSpin, this);
 
     const rightSide = new Graphics()
-      .beginFill(0xff0000, 0.1) // TODO: Relplace color with 0xffffff
+      .beginFill(0xffffff, 0.01) // TODO: Relplace color with 0xffffff
       .drawRect(
         window.innerWidth / 2,
         0,
@@ -184,6 +204,10 @@ export default class Game extends Scene {
     if (this.isWinner) {
       this.timer.stop();
 
+      if (this.winSound) {
+        this.winSound.play();
+      }
+
       console.log("🔓 Winner! 🪙🪙🪙");
       this.removeChild(this.handle, this.handleShadow, this.door);
       this.addChild(this.doorOpenShadow, this.doorOpen);
@@ -209,13 +233,23 @@ export default class Game extends Scene {
   }
 
   async start() {
+    if (this.themeSong) {
+      this.themeSong.play();
+    }
     this.setupInteractions();
     this.getVaultCombination();
     this.timer.start();
   }
 
   restartGame() {
-    this.timer.reset();
+    if (this.winSound) {
+      this.winSound.stop();
+    }
+
+    if (this.vaultCloseSound) {
+      this.vaultCloseSound.play();
+    }
+
     this.removeChild(this.blink, this.doorOpen, this.doorOpenShadow);
     this.addChild(this.door, this.handleShadow, this.handle);
 
@@ -225,6 +259,7 @@ export default class Game extends Scene {
     this.isWinner = false;
 
     this.getVaultCombination();
+    this.timer.reset();
     this.timer.start();
   }
 
