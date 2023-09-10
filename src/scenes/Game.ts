@@ -213,7 +213,7 @@ export default class Game extends Scene {
       this.removeChild(this.handle, this.handleShadow, this.door);
       this.addChild(this.doorOpenShadow, this.doorOpen);
 
-      this.blink = new Blink(config.blink.blink);
+      this.blink = new Blink(config.effects.blink);
       this.addChild(this.blink);
 
       setTimeout(() => {

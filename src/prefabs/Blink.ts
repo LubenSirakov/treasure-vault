@@ -2,21 +2,18 @@ import { AnimatedSprite, Container, Texture, TilingSprite } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 
 export type BlinkConfig = {
-  layers: string[];
-  panSpeed: number;
+  asset: string;
 };
 
 export class Blink extends Container {
   name = "Blink";
 
-  layers: string[] = [];
   tilingSprites: TilingSprite[] = [];
   blinkingLights: Texture[] = [];
 
   constructor(
     protected config: BlinkConfig = {
-      panSpeed: 1,
-      layers: [],
+      asset: "",
     }
   ) {
     super();
@@ -37,7 +34,7 @@ export class Blink extends Container {
     ];
 
     for (let i = 0; i < 3; i++) {
-      const texture = Texture.from(this.config.layers[0]);
+      const texture = Texture.from(this.config.asset);
       this.blinkingLights.push(texture);
     }
 

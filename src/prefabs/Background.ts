@@ -2,20 +2,18 @@ import { Container, Texture, Ticker, TilingSprite } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 
 export type BgConfig = {
-  layers: string[];
-  panSpeed: number;
+  asset: string;
 };
 
 export default class Background extends Container {
   name = "Background";
 
-  layers: string[] = [];
+  asset: string = "";
   tilingSprites: TilingSprite[] = [];
 
   constructor(
     protected config: BgConfig = {
-      panSpeed: 1,
-      layers: [],
+      asset: "",
     }
   ) {
     super();
@@ -26,46 +24,20 @@ export default class Background extends Container {
   }
 
   init() {
-    for (const layer of this.config.layers) {
-      const texture = Texture.from(layer);
-      const scaleFactor = window.innerHeight / texture.height;
+    const texture = Texture.from(this.config.asset);
+    const scaleFactor = window.innerHeight / texture.height;
 
-      const tilingSprite = new TilingSprite(
-        texture,
-        texture.width,
-        texture.height
-      );
+    const tilingSprite = new TilingSprite(
+      texture,
+      texture.width,
+      texture.height
+    );
 
-      tilingSprite.scale.set(scaleFactor);
-      tilingSprite.name = layer;
-      tilingSprite.anchor.set(0.5);
-
-      this.tilingSprites.push(tilingSprite);
-      this.addChild(tilingSprite);
-    }
-  }
-
-  initPlayerMovement(object: {
-    state: { velocity: { x: number; y: number } };
-  }) {
-    Ticker.shared.add((delta) => {
-      const x = object.state.velocity.x * delta;
-      const y = object.state.velocity.y * delta;
-
-      this.updatePosition(x, y);
-    });
-  }
-
-  updatePosition(x: number, y: number) {
-    for (const [index, child] of this.children.entries()) {
-      if (child instanceof TilingSprite) {
-        child.tilePosition.x -= x * index * this.config.panSpeed;
-        child.tilePosition.y -= y * index * this.config.panSpeed;
-      } else {
-        child.x -= x * index * this.config.panSpeed;
-        child.y -= y * index * this.config.panSpeed;
-      }
-    }
+    tilingSprite.scale.set(scaleFactor);
+    tilingSprite.name = this.config.asset;
+    tilingSprite.anchor.set(0.5);
+    this.tilingSprites.push(tilingSprite);
+    this.addChild(tilingSprite);
   }
 
   resize(width: number, height: number) {

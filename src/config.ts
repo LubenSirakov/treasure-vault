@@ -7,44 +7,37 @@ type Config = {
   backgrounds: Record<string, BgConfig>;
   doors: Record<string, DoorConfig>;
   handles: Record<string, HandleConfig>;
-  blink: Record<string, BlinkConfig>;
+  effects: Record<string, BlinkConfig>;
 };
 
 export default {
   backgrounds: {
     vault: {
-      layers: ["bg"],
-      panSpeed: 0.2,
+      asset: "bg",
     },
   },
   doors: {
     closedDoor: {
-      layers: ["door"],
-      panSpeed: 0.2,
+      asset: "door",
     },
     openedDoor: {
-      layers: ["doorOpen"],
-      panSpeed: 0.2,
+      asset: "doorOpen",
     },
     doorOpenShadow: {
-      layers: ["doorOpenShadow"],
-      panSpeed: 0.2,
+      asset: "doorOpenShadow",
     },
   },
   handles: {
     handle: {
-      layers: ["handle"],
-      panSpeed: 0.2,
+      asset: "handle",
     },
     handleShadow: {
-      layers: ["handleShadow"],
-      panSpeed: 0.2,
+      asset: "handleShadow",
     },
   },
-  blink: {
+  effects: {
     blink: {
-      layers: ["blink"],
-      panSpeed: 0.2,
+      asset: "blink",
     },
   },
 } as Config;
