@@ -3,10 +3,11 @@ import Scene from "../core/Scene";
 import Background from "../prefabs/Background";
 import { Door } from "../prefabs/Door";
 import { Handle } from "../prefabs/Handle";
-import { Graphics } from "pixi.js";
+import { Graphics, Text, TextStyle } from "pixi.js";
 import gsap from "gsap";
 import { generateVaultCombination } from "../utils/combinationGenerator";
 import { Blink } from "../prefabs/Blink";
+import { Timer } from "../utils/Timer";
 
 type CombinationPair = {
   number: number;
@@ -23,6 +24,8 @@ export default class Game extends Scene {
   private handleShadow!: Handle;
   private background!: Background;
   private blink!: Blink;
+  private timerText!: Text;
+  private timer!: Timer;
 
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
@@ -40,6 +43,27 @@ export default class Game extends Scene {
     this.doorOpenShadow = new Door(config.doors.doorOpenShadow);
     this.handle = new Handle(config.handles.handle);
     this.handleShadow = new Handle(config.handles.handleShadow);
+
+    const style = new TextStyle({
+      fontFamily: "Arial",
+      fontSize: 15,
+      fill: ["white"],
+      stroke: "red",
+      fontWeight: "lighter",
+      lineJoin: "round",
+      strokeThickness: 2,
+    });
+
+    this.timerText = new Text();
+    this.timer = new Timer((time) => {
+      if (this.timerText) {
+        this.timerText.text = time;
+        this.timerText.style = style;
+      }
+    });
+
+    this.timerText.x = window.innerWidth / 2 - this.door.width / 2 - 50;
+    this.timerText.y = window.innerHeight / 2 - this.door.height / 10;
 
     // Door
     this.door.x = window.innerWidth / 2 + 20;
@@ -63,7 +87,13 @@ export default class Game extends Scene {
     this.handleShadow.x = window.innerWidth / 2 + 10;
     this.handleShadow.y = window.innerHeight / 2 - 10;
 
-    this.addChild(this.background, this.door, this.handleShadow, this.handle);
+    this.addChild(
+      this.background,
+      this.door,
+      this.handleShadow,
+      this.handle,
+      this.timerText
+    );
   }
 
   private setupInteractions() {
@@ -177,6 +207,8 @@ export default class Game extends Scene {
     }
 
     if (this.isWinner) {
+      this.timer.stop();
+
       console.log("Winner!");
       this.removeChild(this.handle, this.handleShadow, this.door);
       this.addChild(this.doorOpenShadow, this.doorOpen);
@@ -204,9 +236,11 @@ export default class Game extends Scene {
   async start() {
     this.setupInteractions();
     this.getVaultCombination();
+    this.timer.start();
   }
 
   restartGame() {
+    this.timer.reset();
     this.removeChild(this.blink, this.doorOpen, this.doorOpenShadow);
     this.addChild(this.door, this.handleShadow, this.handle);
 
@@ -216,6 +250,7 @@ export default class Game extends Scene {
     this.isWinner = false;
 
     this.getVaultCombination();
+    this.timer.start();
   }
 
   onResize(width: number, height: number) {
@@ -229,13 +264,18 @@ export default class Game extends Scene {
       this.handle.y = window.innerHeight / 2 - 10;
     }
 
+    if (this.handleShadow) {
+      this.handleShadow.x = window.innerWidth / 2 + 10;
+      this.handleShadow.y = window.innerHeight / 2 - 10;
+    }
+
     if (this.doorOpen) {
       this.doorOpen.x = window.innerWidth / 1.3;
       this.doorOpen.y = window.innerHeight / 2;
     }
 
     if (this.background) {
-      this.background.resize(window.innerWidth, window.innerHeight);
+      this.background.resize(width, height);
     }
   }
 }
