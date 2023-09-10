@@ -103,7 +103,7 @@ export default class Game extends Scene {
       .endFill();
     leftSide.interactive = true;
     leftSide.cursor = "poiner";
-    leftSide.on("pointerdown", this.spinCounterclockwise, this);
+    leftSide.on("pointerdown", this.onCounterclockwiseSpin, this);
 
     const rightSide = new Graphics()
       .beginFill(0xff0000, 0.1) // TODO: Relplace color with 0xffffff
@@ -116,55 +116,30 @@ export default class Game extends Scene {
       .endFill();
     rightSide.interactive = true;
     rightSide.cursor = "pointer";
-    rightSide.on("pointerdown", this.spinClockwise, this);
+    rightSide.on("pointerdown", this.onClockwiseSpin, this);
 
     this.addChild(leftSide, rightSide);
   }
 
-  private spinClockwise() {
-    console.log("spin Clockwise");
+  private onClockwiseSpin() {
+    console.log("Clockwise spin");
 
-    gsap.to(this.handle, {
-      rotation: this.handle.rotation + Math.PI * 0.5,
-      duration: 1,
-      onComplete: () => {},
-    });
-
-    gsap.to(this.handleShadow, {
-      rotation: this.handleShadow.rotation + Math.PI * 0.5,
-      duration: 1,
-      onComplete: () => {},
-    });
+    this.handle.spinClockwise();
+    this.handleShadow.spinClockwise();
     this.onTap("clockwise");
   }
 
-  private spinCounterclockwise() {
-    console.log("spin Counterclockwise");
+  private onCounterclockwiseSpin() {
+    console.log("Counterclockwise spin");
 
-    gsap.to(this.handle, {
-      rotation: this.handle.rotation - Math.PI * 0.5,
-      duration: 1,
-      onComplete: () => {},
-    });
-
-    gsap.to(this.handleShadow, {
-      rotation: this.handleShadow.rotation - Math.PI * 0.5,
-      duration: 1,
-      onComplete: () => {},
-    });
+    this.handle.spinCounterclockwise();
+    this.handleShadow.spinCounterclockwise();
     this.onTap("counterclockwise");
   }
 
-  private crazyHandleSpin() {
-    gsap.to(this.handle, {
-      rotation: this.handle.rotation + Math.PI * 4,
-      duration: 1,
-    });
-
-    gsap.to(this.handleShadow, {
-      rotation: this.handleShadow.rotation + Math.PI * 4,
-      duration: 1,
-    });
+  private onCrazyHandleSpin() {
+    this.handle.crazyHandleSpin();
+    this.handleShadow.crazyHandleSpin();
   }
 
   private onTap(direction: "clockwise" | "counterclockwise") {
@@ -196,9 +171,9 @@ export default class Game extends Scene {
         currentPair.number !== this.vaultCombination[i].number ||
         currentPair.direction !== this.vaultCombination[i].direction
       ) {
-        console.log("Game over!");
+        console.log("⛔ Game over!");
         // Game should reset and handle should spin
-        this.crazyHandleSpin();
+        this.onCrazyHandleSpin();
         this.restartGame();
       } else {
         console.log("Correct! currentPair:", currentPair);
@@ -209,7 +184,7 @@ export default class Game extends Scene {
     if (this.isWinner) {
       this.timer.stop();
 
-      console.log("Winner!");
+      console.log("🔓 Winner! 🪙🪙🪙");
       this.removeChild(this.handle, this.handleShadow, this.door);
       this.addChild(this.doorOpenShadow, this.doorOpen);
 
@@ -217,7 +192,7 @@ export default class Game extends Scene {
       this.addChild(this.blink);
 
       setTimeout(() => {
-        this.crazyHandleSpin();
+        this.onCrazyHandleSpin();
         this.restartGame();
       }, 5000);
     }
@@ -230,7 +205,7 @@ export default class Game extends Scene {
       this.vaultCombination.push({ number: Number(number), direction });
     });
 
-    console.log(`Vault Combination: ${vaultCombination.join(", ")}`);
+    console.log(`🔒 Vault Combination: ${vaultCombination.join(", ")}`);
   }
 
   async start() {
