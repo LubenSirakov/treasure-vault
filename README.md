@@ -18,7 +18,7 @@ But be ready, for the path to riches is guarded by a mysterious vault.
 | `npm run preview` | Preview production build (must run `build` before running `preview`) |
 
 ### How to play?
-When the game is loads a secret combination which unlocks the vault will be logged in the browser console.
+When the game loads a secret combination which unlocks the vault will be logged in the browser console.
 The combination consists of three pairs, looking something like this: 
 ```
 🔒 Vault Combination: 9 clockwise, 6 counterclockwise, 3 clockwise
