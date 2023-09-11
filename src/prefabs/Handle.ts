@@ -11,6 +11,7 @@ export class Handle extends Container {
   name = "Handle";
 
   private sound: Howl | null = null;
+  private safeSpinSound: Howl | null = null;
 
   constructor(
     protected config: HandleConfig = {
@@ -48,38 +49,42 @@ export class Handle extends Container {
       src: ["public/Game/sounds/handle-rotating.wav"],
       volume: 0.8,
     });
+
+    this.safeSpinSound = new Howl({
+      src: ["public/Game/sounds/safe-locking.mp3"],
+      volume: 0.8,
+    });
   }
 
   spinClockwise() {
-    if (this.sound) {
-      this.sound.play();
-    }
     gsap.to(this, {
       rotation: this.rotation + Math.PI * 0.5,
       duration: 1,
     });
-  }
-
-  spinCounterclockwise() {
     if (this.sound) {
       this.sound.play();
     }
+  }
+
+  spinCounterclockwise() {
     gsap.to(this, {
       rotation: this.rotation - Math.PI * 0.5,
       duration: 1,
     });
+    if (this.sound) {
+      this.sound.play();
+    }
   }
 
   crazyHandleSpin() {
-    if (this.sound) {
-      this.sound.loop(2);
-      this.sound.play();
+    if (this.safeSpinSound) {
+      this.safeSpinSound.play();
     }
     gsap.to(this, {
       rotation: this.rotation + Math.PI * 4,
       duration: 1,
       onComplete: () => {
-        this.sound?.stop();
+        this.safeSpinSound?.stop();
       },
     });
   }

@@ -24,11 +24,14 @@ export default class Game extends Scene {
   private handleShadow!: Handle;
   private background!: Background;
   private blink!: Blink;
+
   private timerText!: Text;
   private timer!: Timer;
+
   private themeSong!: Howl;
   private winSound!: Howl;
   private vaultCloseSound!: Howl;
+  private errorSound!: Howl;
 
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
@@ -62,6 +65,11 @@ export default class Game extends Scene {
     this.vaultCloseSound = new Howl({
       src: ["public/Game/sounds/vault-close.mp3"],
       volume: 0.8,
+    });
+
+    this.errorSound = new Howl({
+      src: ["public/Game/sounds/error.mp3"],
+      volume: 1.0,
     });
 
     const style = new TextStyle({
@@ -142,6 +150,9 @@ export default class Game extends Scene {
   }
 
   private onClockwiseSpin() {
+    if (this.isWinner) {
+      return;
+    }
     console.log("Clockwise spin");
 
     this.handle.spinClockwise();
@@ -150,6 +161,9 @@ export default class Game extends Scene {
   }
 
   private onCounterclockwiseSpin() {
+    if (this.isWinner) {
+      return;
+    }
     console.log("Counterclockwise spin");
 
     this.handle.spinCounterclockwise();
@@ -163,6 +177,10 @@ export default class Game extends Scene {
   }
 
   private onTap(direction: "clockwise" | "counterclockwise") {
+    if (this.isWinner) {
+      return;
+    }
+
     if (
       direction === this.lastTapDirection &&
       this.currentCombination.direction !== null
@@ -191,12 +209,23 @@ export default class Game extends Scene {
         currentPair.number !== this.vaultCombination[i].number ||
         currentPair.direction !== this.vaultCombination[i].direction
       ) {
+        if (this.errorSound) {
+          this.errorSound.play();
+        }
         console.log("⛔ Game over!");
         // Game should reset and handle should spin
         this.onCrazyHandleSpin();
         this.restartGame();
       } else {
-        console.log("Correct! currentPair:", currentPair);
+        const remainingPairs = this.vaultCombination
+          .slice(i + 1)
+          .map((pair) => pair.number + " " + pair.direction)
+          .join(", ");
+
+        if (remainingPairs) {
+          console.log(`Remaining: ${remainingPairs}`);
+        }
+
         this.isWinner = i === this.vaultCombination.length - 1;
       }
     }
@@ -216,6 +245,9 @@ export default class Game extends Scene {
       this.addChild(this.blink);
 
       setTimeout(() => {
+        if (this.vaultCloseSound) {
+          this.vaultCloseSound.play();
+        }
         this.onCrazyHandleSpin();
         this.restartGame();
       }, 5000);
@@ -244,10 +276,6 @@ export default class Game extends Scene {
   restartGame() {
     if (this.winSound) {
       this.winSound.stop();
-    }
-
-    if (this.vaultCloseSound) {
-      this.vaultCloseSound.play();
     }
 
     this.removeChild(this.blink, this.doorOpen, this.doorOpenShadow);
