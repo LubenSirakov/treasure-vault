@@ -2,6 +2,7 @@ import { Container, Texture, TilingSprite } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 import gsap from "gsap";
 import { Howl } from "howler";
+import { Sounds } from "./Sounds";
 
 export type HandleConfig = {
   asset: string;
@@ -10,8 +11,7 @@ export type HandleConfig = {
 export class Handle extends Container {
   name = "Handle";
 
-  private sound: Howl | null = null;
-  private safeSpinSound: Howl | null = null;
+  private sounds: Sounds;
 
   constructor(
     protected config: HandleConfig = {
@@ -24,7 +24,7 @@ export class Handle extends Container {
 
     centerObjects(this);
 
-    this.loadSound();
+    this.sounds = new Sounds();
   }
 
   init() {
@@ -44,26 +44,13 @@ export class Handle extends Container {
     this.addChild(tilingSprite);
   }
 
-  private loadSound() {
-    this.sound = new Howl({
-      src: ["public/Game/sounds/handle-rotating.wav"],
-      volume: 0.8,
-    });
-
-    this.safeSpinSound = new Howl({
-      src: ["public/Game/sounds/safe-locking.mp3"],
-      volume: 0.8,
-    });
-  }
-
   spinClockwise() {
     gsap.to(this, {
       rotation: this.rotation + Math.PI * 0.5,
       duration: 1,
     });
-    if (this.sound) {
-      this.sound.play();
-    }
+
+    this.sounds.playHandleRotationSound();
   }
 
   spinCounterclockwise() {
@@ -71,20 +58,18 @@ export class Handle extends Container {
       rotation: this.rotation - Math.PI * 0.5,
       duration: 1,
     });
-    if (this.sound) {
-      this.sound.play();
-    }
+
+    this.sounds.playHandleRotationSound();
   }
 
   crazyHandleSpin() {
-    if (this.safeSpinSound) {
-      this.safeSpinSound.play();
-    }
+    this.sounds.playSafeSpinSound();
+
     gsap.to(this, {
-      rotation: this.rotation + Math.PI * 4,
+      rotation: this.rotation + Math.PI * 100,
       duration: 1,
       onComplete: () => {
-        this.safeSpinSound?.stop();
+        this.sounds.stopSafeSpinSound();
       },
     });
   }

@@ -4,10 +4,10 @@ import Background from "../prefabs/Background";
 import { Door } from "../prefabs/Door";
 import { Handle } from "../prefabs/Handle";
 import { Graphics, Text, TextStyle } from "pixi.js";
-import gsap from "gsap";
 import { generateVaultCombination } from "../utils/combinationGenerator";
 import { Blink } from "../prefabs/Blink";
 import { Timer } from "../utils/Timer";
+import { Sounds } from "../prefabs/Sounds";
 
 type CombinationPair = {
   number: number;
@@ -28,10 +28,7 @@ export default class Game extends Scene {
   private timerText!: Text;
   private timer!: Timer;
 
-  private themeSong!: Howl;
-  private winSound!: Howl;
-  private vaultCloseSound!: Howl;
-  private errorSound!: Howl;
+  private sounds!: Sounds;
 
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
@@ -49,28 +46,7 @@ export default class Game extends Scene {
     this.doorOpenShadow = new Door(config.doors.doorOpenShadow);
     this.handle = new Handle(config.handles.handle);
     this.handleShadow = new Handle(config.handles.handleShadow);
-
-    this.themeSong = new Howl({
-      src: ["public/Game/sounds/theme-song.mp3"],
-      volume: 0.8,
-      loop: true,
-    });
-
-    this.winSound = new Howl({
-      src: ["public/Game/sounds/win.mp3"],
-      volume: 1.0,
-      loop: true,
-    });
-
-    this.vaultCloseSound = new Howl({
-      src: ["public/Game/sounds/vault-close.mp3"],
-      volume: 0.8,
-    });
-
-    this.errorSound = new Howl({
-      src: ["public/Game/sounds/error.mp3"],
-      volume: 1.0,
-    });
+    this.sounds = new Sounds();
 
     const style = new TextStyle({
       fontFamily: "Arial",
@@ -209,9 +185,8 @@ export default class Game extends Scene {
         currentPair.number !== this.vaultCombination[i].number ||
         currentPair.direction !== this.vaultCombination[i].direction
       ) {
-        if (this.errorSound) {
-          this.errorSound.play();
-        }
+        this.sounds.playErrorSound();
+
         console.log("⛔ Game over!");
         // Game should reset and handle should spin
         this.onCrazyHandleSpin();
@@ -232,12 +207,10 @@ export default class Game extends Scene {
 
     if (this.isWinner) {
       this.timer.stop();
-
-      if (this.winSound) {
-        this.winSound.play();
-      }
+      this.sounds.playWinSound();
 
       console.log("🔓 Winner! 🪙🪙🪙");
+
       this.removeChild(this.handle, this.handleShadow, this.door);
       this.addChild(this.doorOpenShadow, this.doorOpen);
 
@@ -245,9 +218,7 @@ export default class Game extends Scene {
       this.addChild(this.blink);
 
       setTimeout(() => {
-        if (this.vaultCloseSound) {
-          this.vaultCloseSound.play();
-        }
+        this.sounds.playVaultCloseSound();
         this.onCrazyHandleSpin();
         this.restartGame();
       }, 5000);
@@ -265,19 +236,14 @@ export default class Game extends Scene {
   }
 
   async start() {
-    if (this.themeSong) {
-      this.themeSong.play();
-    }
+    this.sounds.playThemeSong();
     this.setupInteractions();
     this.getVaultCombination();
     this.timer.start();
   }
 
   restartGame() {
-    if (this.winSound) {
-      this.winSound.stop();
-    }
-
+    this.sounds.stopWinSound();
     this.removeChild(this.blink, this.doorOpen, this.doorOpenShadow);
     this.addChild(this.door, this.handleShadow, this.handle);
 
