@@ -17,7 +17,7 @@ type CombinationPair = {
 export default class Game extends Scene {
   name = "Game";
 
-  private door!: Door;
+  private doorClosed!: Door;
   private doorOpen!: Door;
   private doorOpenShadow!: Door;
   private handle!: Handle;
@@ -32,7 +32,7 @@ export default class Game extends Scene {
 
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
-  private debounceTime: number = 1000; // Adjust the debounce time in milliseconds
+  private debounceTime: number = 1000;
   private debounceTimer: number | undefined;
   private vaultCombination: CombinationPair[] = [];
   private currentCombination: CombinationPair = { number: 0, direction: null };
@@ -40,8 +40,7 @@ export default class Game extends Scene {
 
   load() {
     this.background = new Background(config.backgrounds.vault);
-
-    this.door = new Door(config.doors.closedDoor);
+    this.doorClosed = new Door(config.doors.closedDoor);
     this.doorOpen = new Door(config.doors.openedDoor);
     this.doorOpenShadow = new Door(config.doors.doorOpenShadow);
     this.handle = new Handle(config.handles.handle);
@@ -66,19 +65,21 @@ export default class Game extends Scene {
       }
     });
 
-    this.timerText.x = window.innerWidth / 2 - this.door.width / 2 - 50;
-    this.timerText.y = window.innerHeight / 2 - this.door.height / 10;
+    // Timer
+    this.timerText.x = window.innerWidth / 2 - this.doorClosed.width / 2 - 50;
+    this.timerText.y = window.innerHeight / 2 - this.doorClosed.height / 10;
 
-    // Door
-    this.door.x = window.innerWidth / 2 + 20;
-    this.door.y = window.innerHeight / 2 - 10;
+    // Door closed
+    this.doorClosed.x = window.innerWidth / 2 + 20;
+    this.doorClosed.y = window.innerHeight / 2 - 10;
 
     // Door open
-    this.doorOpen.x = window.innerWidth / 2 + this.door.width / 1.4;
+    this.doorOpen.x = window.innerWidth / 2 + this.doorClosed.width / 1.4;
     this.doorOpen.y = window.innerHeight / 2;
 
     // Door open shadow
-    this.doorOpenShadow.x = window.innerWidth / 2 + this.door.width / 1.4 + 20;
+    this.doorOpenShadow.x =
+      window.innerWidth / 2 + this.doorClosed.width / 1.4 + 20;
     this.doorOpenShadow.y = window.innerHeight / 2 + 20;
 
     // Handle
@@ -93,7 +94,7 @@ export default class Game extends Scene {
 
     this.addChild(
       this.background,
-      this.door,
+      this.doorClosed,
       this.handleShadow,
       this.handle,
       this.timerText
@@ -110,7 +111,7 @@ export default class Game extends Scene {
     leftSide.on("pointerdown", this.onCounterclockwiseSpin, this);
 
     const rightSide = new Graphics()
-      .beginFill(0xffffff, 0.01) // TODO: Relplace color with 0xffffff
+      .beginFill(0xffffff, 0.01)
       .drawRect(
         window.innerWidth / 2,
         0,
@@ -211,7 +212,7 @@ export default class Game extends Scene {
 
       console.log("🔓 Winner! 🪙🪙🪙");
 
-      this.removeChild(this.handle, this.handleShadow, this.door);
+      this.removeChild(this.handle, this.handleShadow, this.doorClosed);
       this.addChild(this.doorOpenShadow, this.doorOpen);
 
       this.blink = new Blink(config.effects.blink);
@@ -245,7 +246,7 @@ export default class Game extends Scene {
   restartGame() {
     this.sounds.stopWinSound();
     this.removeChild(this.blink, this.doorOpen, this.doorOpenShadow);
-    this.addChild(this.door, this.handleShadow, this.handle);
+    this.addChild(this.doorClosed, this.handleShadow, this.handle);
 
     this.vaultCombination = [];
     this.currentCombination = { number: 0, direction: null };
@@ -258,9 +259,9 @@ export default class Game extends Scene {
   }
 
   onResize(width: number, height: number) {
-    if (this.door) {
-      this.door.x = window.innerWidth / 2 + 20;
-      this.door.y = window.innerHeight / 2 - 10;
+    if (this.doorClosed) {
+      this.doorClosed.x = window.innerWidth / 2 + 20;
+      this.doorClosed.y = window.innerHeight / 2 - 10;
     }
 
     if (this.handle) {

@@ -32,7 +32,7 @@ export class Door extends Container {
       texture.height
     );
 
-    tilingSprite.scale.set(scaleFactor / 1.6); // TODO: Remove hardcoded value
+    tilingSprite.scale.set(scaleFactor / 1.6);
     tilingSprite.name = this.config.asset;
     tilingSprite.anchor.set(0.5);
 

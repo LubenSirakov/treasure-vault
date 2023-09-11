@@ -1,7 +1,6 @@
 import { Container, Texture, TilingSprite } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 import gsap from "gsap";
-import { Howl } from "howler";
 import { Sounds } from "./Sounds";
 
 export type HandleConfig = {
