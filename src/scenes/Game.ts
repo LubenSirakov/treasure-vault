@@ -30,6 +30,9 @@ export default class Game extends Scene {
 
   private sounds!: Sounds;
 
+  private leftHitArea!: Graphics;
+  private rightHitArea!: Graphics;
+
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
   private debounceTime: number = 1000;
@@ -93,25 +96,26 @@ export default class Game extends Scene {
     this.handleShadow.y = window.innerHeight / 2 - 10;
 
     this.addChild(
-      this.background,
-      this.doorClosed,
-      this.handleShadow,
-      this.handle,
-      this.timerText
+      this.background
+      // TODO: Uncomment elements
+      // this.doorClosed,
+      // this.handleShadow,
+      // this.handle,
+      // this.timerText
     );
   }
 
   private setupInteractions() {
-    const leftSide = new Graphics()
+    this.leftHitArea = new Graphics()
       .beginFill(0xffffff, 0.01)
       .drawRect(0, 0, window.innerWidth / 2, window.innerHeight)
       .endFill();
-    leftSide.interactive = true;
-    leftSide.cursor = "poiner";
-    leftSide.on("pointerdown", this.onCounterclockwiseSpin, this);
+    this.leftHitArea.interactive = true;
+    this.leftHitArea.cursor = "poiner";
+    this.leftHitArea.on("pointerdown", this.onCounterclockwiseSpin, this);
 
-    const rightSide = new Graphics()
-      .beginFill(0xffffff, 0.01)
+    this.rightHitArea = new Graphics()
+      .beginFill(0xffffff, 0.2)
       .drawRect(
         window.innerWidth / 2,
         0,
@@ -119,11 +123,17 @@ export default class Game extends Scene {
         window.innerHeight
       )
       .endFill();
-    rightSide.interactive = true;
-    rightSide.cursor = "pointer";
-    rightSide.on("pointerdown", this.onClockwiseSpin, this);
+    this.rightHitArea.interactive = true;
+    this.rightHitArea.cursor = "pointer";
+    this.rightHitArea.on("pointerdown", this.onClockwiseSpin, this);
 
-    this.addChild(leftSide, rightSide);
+    this.addChild(this.leftHitArea, this.rightHitArea);
+  }
+
+  private updateInteractions() {
+    this.removeChild(this.leftHitArea, this.rightHitArea);
+
+    this.setupInteractions();
   }
 
   private onClockwiseSpin() {
@@ -259,24 +269,36 @@ export default class Game extends Scene {
   }
 
   onResize(width: number, height: number) {
+    this.updateInteractions();
+
     if (this.doorClosed) {
-      this.doorClosed.x = window.innerWidth / 2 + 20;
-      this.doorClosed.y = window.innerHeight / 2 - 10;
+      this.doorClosed.x = width / 2 + 20;
+      this.doorClosed.y = height / 2 - 10;
     }
 
     if (this.handle) {
-      this.handle.x = window.innerWidth / 2;
-      this.handle.y = window.innerHeight / 2 - 10;
+      this.handle.x = width / 2;
+      this.handle.y = height / 2 - 10;
     }
 
     if (this.handleShadow) {
-      this.handleShadow.x = window.innerWidth / 2 + 10;
-      this.handleShadow.y = window.innerHeight / 2 - 10;
+      this.handleShadow.x = width / 2 + 10;
+      this.handleShadow.y = height / 2 - 10;
     }
 
     if (this.doorOpen) {
-      this.doorOpen.x = window.innerWidth / 1.3;
-      this.doorOpen.y = window.innerHeight / 2;
+      this.doorOpen.x = width / 2 + this.doorClosed.width / 1.4;
+      this.doorOpen.y = height / 2;
+    }
+
+    if (this.doorOpenShadow) {
+      this.doorOpenShadow.x = width / 2 + this.doorClosed.width / 1.4 + 20;
+      this.doorOpenShadow.y = height / 2 + 20;
+    }
+
+    if (this.timerText) {
+      this.timerText.x = width / 2 - this.doorClosed.width / 2 - 50;
+      this.timerText.y = height / 2 - this.doorClosed.height / 10;
     }
 
     if (this.background) {

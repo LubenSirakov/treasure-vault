@@ -1,5 +1,4 @@
-import { Container, Texture, TilingSprite } from "pixi.js";
-import { centerObjects } from "../utils/misc";
+import { Container, Sprite, Texture } from "pixi.js";
 
 export type BgConfig = {
   asset: string;
@@ -9,7 +8,7 @@ export default class Background extends Container {
   name = "Background";
 
   asset: string = "";
-  tilingSprites: TilingSprite[] = [];
+  backgroundSprites: Sprite[] = [];
 
   constructor(
     protected config: BgConfig = {
@@ -19,35 +18,43 @@ export default class Background extends Container {
     super();
 
     this.init();
-
-    centerObjects(this);
   }
 
   init() {
     const texture = Texture.from(this.config.asset);
-    const scaleFactor = window.innerHeight / texture.height;
+    const backgroundSprite = new Sprite(texture);
 
-    const tilingSprite = new TilingSprite(
-      texture,
-      texture.width,
-      texture.height
+    const scaleFactorWidth = window.innerWidth / backgroundSprite.texture.width;
+    const scaleFactorHeight =
+      window.innerHeight / backgroundSprite.texture.height;
+    const scaleFactor = Math.max(scaleFactorWidth, scaleFactorHeight);
+
+    backgroundSprite.width = window.innerWidth;
+    backgroundSprite.height = window.innerHeight;
+    backgroundSprite.scale.set(scaleFactor);
+
+    backgroundSprite.position.set(
+      window.innerWidth / 2,
+      window.innerHeight / 2
     );
 
-    tilingSprite.scale.set(scaleFactor);
-    tilingSprite.name = this.config.asset;
-    tilingSprite.anchor.set(0.5);
-    this.tilingSprites.push(tilingSprite);
-    this.addChild(tilingSprite);
+    backgroundSprite.anchor.set(0.5);
+
+    this.backgroundSprites.push(backgroundSprite);
+    this.addChild(backgroundSprite);
   }
 
   resize(width: number, height: number) {
-    for (const layer of this.tilingSprites) {
-      const scaleFactor = height / layer.texture.height;
+    for (const layer of this.backgroundSprites) {
+      const scaleFactorWidth = width / layer.texture.width;
+      const scaleFactorHeight = height / layer.texture.height;
+      const scaleFactor = Math.max(scaleFactorWidth, scaleFactorHeight);
 
-      layer.width = width / scaleFactor;
+      layer.width = width;
+      layer.height = height;
       layer.scale.set(scaleFactor);
-    }
 
-    centerObjects(this);
+      layer.position.set(width / 2, height / 2);
+    }
   }
 }
