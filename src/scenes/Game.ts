@@ -16,7 +16,7 @@ type CombinationPair = {
 
 export default class Game extends Scene {
   name = "Game";
-  private square!: Graphics;
+
   private doorClosed!: Vault;
   private doorOpen!: Vault;
   private doorOpenShadow!: Vault;
@@ -129,16 +129,11 @@ export default class Game extends Scene {
     this.rightHitArea.cursor = "pointer";
     this.rightHitArea.on("pointerdown", this.onClockwiseSpin, this);
 
-    this.square = new Graphics()
-      .beginFill("red", 1)
-      .drawRect(window.innerWidth / 2, window.innerHeight / 2, 50, 50)
-      .endFill();
-
-    this.addChild(this.leftHitArea, this.rightHitArea, this.square);
+    this.addChild(this.leftHitArea, this.rightHitArea);
   }
 
   private updateInteractions() {
-    this.removeChild(this.leftHitArea, this.rightHitArea, this.square);
+    this.removeChild(this.leftHitArea, this.rightHitArea);
 
     this.setupInteractions();
   }
