@@ -16,6 +16,8 @@ export class Handle extends Vault {
     super(config);
 
     this.sounds = new Sounds();
+
+    centerObjects(this);
   }
 
   spinClockwise() {

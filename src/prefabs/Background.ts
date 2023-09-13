@@ -1,4 +1,5 @@
 import { Container, Sprite, Texture } from "pixi.js";
+import gsap from "gsap";
 
 export type BgConfig = {
   asset: string;
@@ -55,6 +56,13 @@ export default class Background extends Container {
       layer.scale.set(scaleFactor);
 
       layer.position.set(width / 2, height / 2);
+
+      gsap.to(layer, {
+        duration: 0.5,
+        width: layer.width,
+        height: layer.height,
+        ease: "power2.out",
+      });
     }
   }
 }

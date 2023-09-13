@@ -8,6 +8,7 @@ import { Blink } from "../prefabs/Blink";
 import { Timer } from "../utils/Timer";
 import { Sounds } from "../prefabs/Sounds";
 import { Vault } from "../prefabs/Vault";
+import gsap from "gsap";
 
 type CombinationPair = {
   number: number;
@@ -90,20 +91,22 @@ export default class Game extends Scene {
     // Handle
     this.handle.eventMode = "static";
     this.handle.cursor = "pointer";
-    this.handle.x = window.innerWidth / 2 - 10;
-    this.handle.y = window.innerHeight / 2 - 10;
+    this.handle.x = this.doorClosed.x - 20;
+    this.handle.y = this.doorClosed.y;
     this.handle.width = this.background.width / 9;
     this.handle.height = this.background.height / 4;
 
     // Handle shadow
-    this.handleShadow.x = window.innerWidth / 2 - 5;
-    this.handleShadow.y = window.innerHeight / 2;
+    this.handleShadow.x = this.doorClosed.x - 15;
+    this.handleShadow.y = this.doorClosed.y + 10;
     this.handleShadow.width = this.background.width / 9;
     this.handleShadow.height = this.background.height / 4;
 
     // Timer
-    this.timerText.x = window.innerWidth / 2 - this.doorClosed.width / 2 - 50;
+    this.timerText.x = window.innerWidth / 2 - this.doorClosed.width / 1.6;
     this.timerText.y = window.innerHeight / 2 - this.doorClosed.height / 10;
+    this.timerText.width = window.innerWidth / 35;
+    this.timerText.height = window.innerHeight / 30;
 
     this.addChild(
       this.background,
@@ -277,28 +280,44 @@ export default class Game extends Scene {
     this.timer.start();
   }
 
+  resizeAnimation(element: Vault | Background | Text) {
+    gsap.to(element, {
+      duration: 0.25,
+      width: element.width,
+      height: element.height,
+      ease: "power2.out",
+    });
+  }
+
   onResize(width: number, height: number) {
     this.updateInteractions();
+
+    if (this.background) {
+      this.background.resize(width, height);
+    }
 
     if (this.doorClosed) {
       this.doorClosed.x = width / 2 + 10;
       this.doorClosed.y = height / 2 - 10;
       this.doorClosed.width = this.background.width / 3;
       this.doorClosed.height = this.background.height / 1.6;
+      this.resizeAnimation(this.doorClosed);
     }
 
     if (this.handle) {
-      this.handle.x = width / 2 - 10;
-      this.handle.y = height / 2 - 10;
+      this.handle.x = this.doorClosed.x - 20;
+      this.handle.y = this.doorClosed.y;
       this.handle.width = this.background.width / 9;
       this.handle.height = this.background.height / 4;
+      this.resizeAnimation(this.handle);
     }
 
     if (this.handleShadow) {
-      this.handleShadow.x = width / 2 - 5;
-      this.handleShadow.y = height / 2;
+      this.handleShadow.x = this.doorClosed.x - 15;
+      this.handleShadow.y = this.doorClosed.y + 10;
       this.handleShadow.width = this.background.width / 9;
       this.handleShadow.height = this.background.height / 4;
+      this.resizeAnimation(this.handleShadow);
     }
 
     if (this.doorOpen) {
@@ -306,6 +325,7 @@ export default class Game extends Scene {
       this.doorOpen.y = height / 2 - 10;
       this.doorOpen.width = this.background.width / 4.5;
       this.doorOpen.height = this.background.height / 1.55;
+      this.resizeAnimation(this.doorOpen);
     }
 
     if (this.doorOpenShadow) {
@@ -313,15 +333,20 @@ export default class Game extends Scene {
       this.doorOpenShadow.y = height / 2 + 10;
       this.doorOpenShadow.width = this.background.width / 4.1;
       this.doorOpenShadow.height = this.background.height / 1.55;
+      this.resizeAnimation(this.doorOpenShadow);
     }
 
     if (this.timerText) {
-      this.timerText.x = width / 2 - this.doorClosed.width / 2 - 50;
+      this.timerText.x = width / 2 - this.doorClosed.width / 1.6;
       this.timerText.y = height / 2 - this.doorClosed.height / 10;
+      this.timerText.width = width / 35;
+      this.timerText.height = height / 30;
+      this.resizeAnimation(this.timerText);
     }
 
-    if (this.background) {
-      this.background.resize(width, height);
+    if (this.blink) {
+      this.blink.x = this.background.width / 2;
+      this.blink.y = this.background.height / 2;
     }
   }
 }
