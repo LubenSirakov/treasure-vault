@@ -1,46 +1,21 @@
-import { Container, Texture, TilingSprite } from "pixi.js";
-import { centerObjects } from "../utils/misc";
-import gsap from "gsap";
 import { Sounds } from "./Sounds";
+import { Vault } from "./Vault";
+import gsap from "gsap";
+import { centerObjects } from "../utils/misc";
 
 export type HandleConfig = {
   asset: string;
 };
 
-export class Handle extends Container {
+export class Handle extends Vault {
   name = "Handle";
 
   private sounds: Sounds;
 
-  constructor(
-    protected config: HandleConfig = {
-      asset: "",
-    }
-  ) {
-    super();
-
-    this.init();
-
-    centerObjects(this);
+  constructor(config: HandleConfig) {
+    super(config);
 
     this.sounds = new Sounds();
-  }
-
-  init() {
-    const texture = Texture.from(this.config.asset);
-    const scaleFactor = window.innerHeight / texture.height;
-
-    const tilingSprite = new TilingSprite(
-      texture,
-      texture.width,
-      texture.height
-    );
-
-    tilingSprite.scale.set(scaleFactor / 3.7);
-    tilingSprite.name = this.config.asset;
-    tilingSprite.anchor.set(0.5);
-
-    this.addChild(tilingSprite);
   }
 
   spinClockwise() {

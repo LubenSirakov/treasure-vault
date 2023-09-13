@@ -46,8 +46,10 @@ export default class Game extends Scene {
     this.doorClosed = new Vault(config.vault.closedDoor);
     this.doorOpen = new Vault(config.vault.openedDoor);
     this.doorOpenShadow = new Vault(config.vault.doorOpenShadow);
-    this.handle = new Handle(config.handles.handle);
-    this.handleShadow = new Handle(config.handles.handleShadow);
+    this.handle = new Handle(config.vault.handle);
+    this.handleShadow = new Handle(config.vault.handleShadow);
+
+    this.timerText = new Text();
     this.sounds = new Sounds();
 
     const style = new TextStyle({
@@ -60,17 +62,12 @@ export default class Game extends Scene {
       strokeThickness: 2,
     });
 
-    this.timerText = new Text();
     this.timer = new Timer((time) => {
       if (this.timerText) {
         this.timerText.text = time;
         this.timerText.style = style;
       }
     });
-
-    // Timer
-    this.timerText.x = window.innerWidth / 2 - this.doorClosed.width / 2 - 50;
-    this.timerText.y = window.innerHeight / 2 - this.doorClosed.height / 10;
 
     // Door closed
     this.doorClosed.x = window.innerWidth / 2 + 10;
@@ -79,37 +76,47 @@ export default class Game extends Scene {
     this.doorClosed.height = this.background.height / 1.6;
 
     // Door open
-    this.doorOpen.x = window.innerWidth / 2 + this.doorClosed.width / 1.4;
-    this.doorOpen.y = window.innerHeight / 2;
+    this.doorOpen.x = window.innerWidth / 1.37 + 10;
+    this.doorOpen.y = window.innerHeight / 2 - 10;
+    this.doorOpen.width = this.background.width / 4.5;
+    this.doorOpen.height = this.background.height / 1.55;
 
     // Door open shadow
-    this.doorOpenShadow.x =
-      window.innerWidth / 2 + this.doorClosed.width / 1.4 + 20;
-    this.doorOpenShadow.y = window.innerHeight / 2 + 20;
+    this.doorOpenShadow.x = window.innerWidth / 1.37 + 30;
+    this.doorOpenShadow.y = window.innerHeight / 2 + 10;
+    this.doorOpenShadow.width = this.background.width / 4.1;
+    this.doorOpenShadow.height = this.background.height / 1.55;
 
     // Handle
     this.handle.eventMode = "static";
     this.handle.cursor = "pointer";
-    this.handle.x = window.innerWidth / 2;
+    this.handle.x = window.innerWidth / 2 - 10;
     this.handle.y = window.innerHeight / 2 - 10;
+    this.handle.width = this.background.width / 9;
+    this.handle.height = this.background.height / 4;
 
     // Handle shadow
-    this.handleShadow.x = window.innerWidth / 2 + 10;
-    this.handleShadow.y = window.innerHeight / 2 - 10;
+    this.handleShadow.x = window.innerWidth / 2 - 5;
+    this.handleShadow.y = window.innerHeight / 2;
+    this.handleShadow.width = this.background.width / 9;
+    this.handleShadow.height = this.background.height / 4;
+
+    // Timer
+    this.timerText.x = window.innerWidth / 2 - this.doorClosed.width / 2 - 50;
+    this.timerText.y = window.innerHeight / 2 - this.doorClosed.height / 10;
 
     this.addChild(
       this.background,
-      // TODO: Uncomment elements
-      this.doorClosed
-      // this.handleShadow,
-      // this.handle,
-      // this.timerText
+      this.doorClosed,
+      this.handleShadow,
+      this.handle,
+      this.timerText
     );
   }
 
   private setupInteractions() {
     this.leftHitArea = new Graphics()
-      .beginFill(0xffffff, 0.01)
+      .beginFill(0xffffff, 0.001)
       .drawRect(0, 0, window.innerWidth / 2, window.innerHeight)
       .endFill();
     this.leftHitArea.interactive = true;
@@ -117,7 +124,7 @@ export default class Game extends Scene {
     this.leftHitArea.on("pointerdown", this.onCounterclockwiseSpin, this);
 
     this.rightHitArea = new Graphics()
-      .beginFill(0xffffff, 0.2)
+      .beginFill(0xffffff, 0.001)
       .drawRect(
         window.innerWidth / 2,
         0,
@@ -280,30 +287,38 @@ export default class Game extends Scene {
       this.doorClosed.height = this.background.height / 1.6;
     }
 
-    // if (this.handle) {
-    //   this.handle.x = width / 2;
-    //   this.handle.y = height / 2 - 10;
-    // }
+    if (this.handle) {
+      this.handle.x = width / 2 - 10;
+      this.handle.y = height / 2 - 10;
+      this.handle.width = this.background.width / 9;
+      this.handle.height = this.background.height / 4;
+    }
 
-    // if (this.handleShadow) {
-    //   this.handleShadow.x = width / 2 + 10;
-    //   this.handleShadow.y = height / 2 - 10;
-    // }
+    if (this.handleShadow) {
+      this.handleShadow.x = width / 2 - 5;
+      this.handleShadow.y = height / 2;
+      this.handleShadow.width = this.background.width / 9;
+      this.handleShadow.height = this.background.height / 4;
+    }
 
-    // if (this.doorOpen) {
-    //   this.doorOpen.x = width / 2 + this.doorClosed.width / 1.4;
-    //   this.doorOpen.y = height / 2;
-    // }
+    if (this.doorOpen) {
+      this.doorOpen.x = width / 1.37 + 10;
+      this.doorOpen.y = height / 2 - 10;
+      this.doorOpen.width = this.background.width / 4.5;
+      this.doorOpen.height = this.background.height / 1.55;
+    }
 
-    // if (this.doorOpenShadow) {
-    //   this.doorOpenShadow.x = width / 2 + this.doorClosed.width / 1.4 + 20;
-    //   this.doorOpenShadow.y = height / 2 + 20;
-    // }
+    if (this.doorOpenShadow) {
+      this.doorOpenShadow.x = width / 1.37 + 30;
+      this.doorOpenShadow.y = height / 2 + 10;
+      this.doorOpenShadow.width = this.background.width / 4.1;
+      this.doorOpenShadow.height = this.background.height / 1.55;
+    }
 
-    // if (this.timerText) {
-    //   this.timerText.x = width / 2 - this.doorClosed.width / 2 - 50;
-    //   this.timerText.y = height / 2 - this.doorClosed.height / 10;
-    // }
+    if (this.timerText) {
+      this.timerText.x = width / 2 - this.doorClosed.width / 2 - 50;
+      this.timerText.y = height / 2 - this.doorClosed.height / 10;
+    }
 
     if (this.background) {
       this.background.resize(width, height);

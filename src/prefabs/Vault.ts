@@ -1,4 +1,4 @@
-import { Container, Sprite, Texture, TilingSprite } from "pixi.js";
+import { Container, Sprite, Texture } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 
 export type VaultConfig = {
