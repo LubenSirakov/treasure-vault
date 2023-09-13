@@ -1,11 +1,11 @@
 import type { BgConfig } from "./prefabs/Background";
 import { BlinkConfig } from "./prefabs/Blink";
-import { DoorConfig } from "./prefabs/Door";
+import { VaultConfig } from "./prefabs/Vault";
 import { HandleConfig } from "./prefabs/Handle";
 
 type Config = {
   backgrounds: Record<string, BgConfig>;
-  doors: Record<string, DoorConfig>;
+  vault: Record<string, VaultConfig>;
   handles: Record<string, HandleConfig>;
   effects: Record<string, BlinkConfig>;
 };
@@ -16,7 +16,7 @@ export default {
       asset: "bg",
     },
   },
-  doors: {
+  vault: {
     closedDoor: {
       asset: "door",
     },
@@ -25,6 +25,12 @@ export default {
     },
     doorOpenShadow: {
       asset: "doorOpenShadow",
+    },
+    handle: {
+      asset: "handle",
+    },
+    handleShadow: {
+      asset: "handleShadow",
     },
   },
   handles: {

@@ -1,13 +1,13 @@
 import config from "../config";
 import Scene from "../core/Scene";
 import Background from "../prefabs/Background";
-import { Door } from "../prefabs/Door";
 import { Handle } from "../prefabs/Handle";
 import { Graphics, Text, TextStyle } from "pixi.js";
 import { generateVaultCombination } from "../utils/combinationGenerator";
 import { Blink } from "../prefabs/Blink";
 import { Timer } from "../utils/Timer";
 import { Sounds } from "../prefabs/Sounds";
+import { Vault } from "../prefabs/Vault";
 
 type CombinationPair = {
   number: number;
@@ -16,10 +16,10 @@ type CombinationPair = {
 
 export default class Game extends Scene {
   name = "Game";
-
-  private doorClosed!: Door;
-  private doorOpen!: Door;
-  private doorOpenShadow!: Door;
+  private square!: Graphics;
+  private doorClosed!: Vault;
+  private doorOpen!: Vault;
+  private doorOpenShadow!: Vault;
   private handle!: Handle;
   private handleShadow!: Handle;
   private background!: Background;
@@ -43,9 +43,9 @@ export default class Game extends Scene {
 
   load() {
     this.background = new Background(config.backgrounds.vault);
-    this.doorClosed = new Door(config.doors.closedDoor);
-    this.doorOpen = new Door(config.doors.openedDoor);
-    this.doorOpenShadow = new Door(config.doors.doorOpenShadow);
+    this.doorClosed = new Vault(config.vault.closedDoor);
+    this.doorOpen = new Vault(config.vault.openedDoor);
+    this.doorOpenShadow = new Vault(config.vault.doorOpenShadow);
     this.handle = new Handle(config.handles.handle);
     this.handleShadow = new Handle(config.handles.handleShadow);
     this.sounds = new Sounds();
@@ -73,8 +73,10 @@ export default class Game extends Scene {
     this.timerText.y = window.innerHeight / 2 - this.doorClosed.height / 10;
 
     // Door closed
-    this.doorClosed.x = window.innerWidth / 2 + 20;
+    this.doorClosed.x = window.innerWidth / 2 + 10;
     this.doorClosed.y = window.innerHeight / 2 - 10;
+    this.doorClosed.width = this.background.width / 3;
+    this.doorClosed.height = this.background.height / 1.6;
 
     // Door open
     this.doorOpen.x = window.innerWidth / 2 + this.doorClosed.width / 1.4;
@@ -96,9 +98,9 @@ export default class Game extends Scene {
     this.handleShadow.y = window.innerHeight / 2 - 10;
 
     this.addChild(
-      this.background
+      this.background,
       // TODO: Uncomment elements
-      // this.doorClosed,
+      this.doorClosed
       // this.handleShadow,
       // this.handle,
       // this.timerText
@@ -127,11 +129,16 @@ export default class Game extends Scene {
     this.rightHitArea.cursor = "pointer";
     this.rightHitArea.on("pointerdown", this.onClockwiseSpin, this);
 
-    this.addChild(this.leftHitArea, this.rightHitArea);
+    this.square = new Graphics()
+      .beginFill("red", 1)
+      .drawRect(window.innerWidth / 2, window.innerHeight / 2, 50, 50)
+      .endFill();
+
+    this.addChild(this.leftHitArea, this.rightHitArea, this.square);
   }
 
   private updateInteractions() {
-    this.removeChild(this.leftHitArea, this.rightHitArea);
+    this.removeChild(this.leftHitArea, this.rightHitArea, this.square);
 
     this.setupInteractions();
   }
@@ -272,34 +279,36 @@ export default class Game extends Scene {
     this.updateInteractions();
 
     if (this.doorClosed) {
-      this.doorClosed.x = width / 2 + 20;
+      this.doorClosed.x = width / 2 + 10;
       this.doorClosed.y = height / 2 - 10;
+      this.doorClosed.width = this.background.width / 3;
+      this.doorClosed.height = this.background.height / 1.6;
     }
 
-    if (this.handle) {
-      this.handle.x = width / 2;
-      this.handle.y = height / 2 - 10;
-    }
+    // if (this.handle) {
+    //   this.handle.x = width / 2;
+    //   this.handle.y = height / 2 - 10;
+    // }
 
-    if (this.handleShadow) {
-      this.handleShadow.x = width / 2 + 10;
-      this.handleShadow.y = height / 2 - 10;
-    }
+    // if (this.handleShadow) {
+    //   this.handleShadow.x = width / 2 + 10;
+    //   this.handleShadow.y = height / 2 - 10;
+    // }
 
-    if (this.doorOpen) {
-      this.doorOpen.x = width / 2 + this.doorClosed.width / 1.4;
-      this.doorOpen.y = height / 2;
-    }
+    // if (this.doorOpen) {
+    //   this.doorOpen.x = width / 2 + this.doorClosed.width / 1.4;
+    //   this.doorOpen.y = height / 2;
+    // }
 
-    if (this.doorOpenShadow) {
-      this.doorOpenShadow.x = width / 2 + this.doorClosed.width / 1.4 + 20;
-      this.doorOpenShadow.y = height / 2 + 20;
-    }
+    // if (this.doorOpenShadow) {
+    //   this.doorOpenShadow.x = width / 2 + this.doorClosed.width / 1.4 + 20;
+    //   this.doorOpenShadow.y = height / 2 + 20;
+    // }
 
-    if (this.timerText) {
-      this.timerText.x = width / 2 - this.doorClosed.width / 2 - 50;
-      this.timerText.y = height / 2 - this.doorClosed.height / 10;
-    }
+    // if (this.timerText) {
+    //   this.timerText.x = width / 2 - this.doorClosed.width / 2 - 50;
+    //   this.timerText.y = height / 2 - this.doorClosed.height / 10;
+    // }
 
     if (this.background) {
       this.background.resize(width, height);
