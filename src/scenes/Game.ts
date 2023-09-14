@@ -9,6 +9,7 @@ import { Timer } from "../utils/Timer";
 import { Sounds } from "../prefabs/Sounds";
 import { Vault } from "../prefabs/Vault";
 import gsap from "gsap";
+import { animateOnResize } from "../utils/misc";
 
 type CombinationPair = {
   number: number;
@@ -280,15 +281,6 @@ export default class Game extends Scene {
     this.timer.start();
   }
 
-  resizeAnimation(element: Vault | Background | Text) {
-    gsap.to(element, {
-      duration: 0.25,
-      width: element.width,
-      height: element.height,
-      ease: "power2.out",
-    });
-  }
-
   onResize(width: number, height: number) {
     this.updateInteractions();
 
@@ -301,7 +293,7 @@ export default class Game extends Scene {
       this.doorClosed.y = height / 2 - 10;
       this.doorClosed.width = this.background.width / 3;
       this.doorClosed.height = this.background.height / 1.6;
-      this.resizeAnimation(this.doorClosed);
+      animateOnResize(this.doorClosed);
     }
 
     if (this.handle) {
@@ -309,7 +301,7 @@ export default class Game extends Scene {
       this.handle.y = this.doorClosed.y;
       this.handle.width = this.background.width / 9;
       this.handle.height = this.background.height / 4;
-      this.resizeAnimation(this.handle);
+      animateOnResize(this.handle);
     }
 
     if (this.handleShadow) {
@@ -317,7 +309,7 @@ export default class Game extends Scene {
       this.handleShadow.y = this.doorClosed.y + 10;
       this.handleShadow.width = this.background.width / 9;
       this.handleShadow.height = this.background.height / 4;
-      this.resizeAnimation(this.handleShadow);
+      animateOnResize(this.handleShadow);
     }
 
     if (this.doorOpen) {
@@ -325,7 +317,7 @@ export default class Game extends Scene {
       this.doorOpen.y = height / 2 - 10;
       this.doorOpen.width = this.background.width / 4.5;
       this.doorOpen.height = this.background.height / 1.55;
-      this.resizeAnimation(this.doorOpen);
+      animateOnResize(this.doorOpen);
     }
 
     if (this.doorOpenShadow) {
@@ -333,7 +325,7 @@ export default class Game extends Scene {
       this.doorOpenShadow.y = height / 2 + 10;
       this.doorOpenShadow.width = this.background.width / 4.1;
       this.doorOpenShadow.height = this.background.height / 1.55;
-      this.resizeAnimation(this.doorOpenShadow);
+      animateOnResize(this.doorOpenShadow);
     }
 
     if (this.timerText) {
@@ -341,7 +333,7 @@ export default class Game extends Scene {
       this.timerText.y = height / 2 - this.doorClosed.height / 10;
       this.timerText.width = width / 35;
       this.timerText.height = height / 30;
-      this.resizeAnimation(this.timerText);
+      animateOnResize(this.timerText);
     }
 
     if (this.blink) {
