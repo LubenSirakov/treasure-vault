@@ -34,6 +34,7 @@ export default class Game extends Scene {
   private leftHitArea!: Graphics;
   private rightHitArea!: Graphics;
 
+  private isMobile: boolean = false;
   private isWinner: boolean = false;
   private lastTapDirection: "clockwise" | "counterclockwise" | null = null;
   private debounceTime: number = 1000;
@@ -52,6 +53,7 @@ export default class Game extends Scene {
 
     this.timerText = new Text();
     this.sounds = new Sounds();
+    this.isMobile = window.innerHeight > window.innerWidth;
 
     const style = new TextStyle({
       fontFamily: "Arial",
@@ -77,13 +79,17 @@ export default class Game extends Scene {
     this.doorClosed.height = this.background.height / 1.6;
 
     // Door open
-    this.doorOpen.x = window.innerWidth / 1.37 + 10;
+    this.doorOpen.x = this.isMobile
+      ? window.innerWidth
+      : window.innerWidth / 1.37 + 10;
     this.doorOpen.y = window.innerHeight / 2 - 10;
     this.doorOpen.width = this.background.width / 4.5;
     this.doorOpen.height = this.background.height / 1.55;
 
     // Door open shadow
-    this.doorOpenShadow.x = window.innerWidth / 1.37 + 30;
+    this.doorOpenShadow.x = this.isMobile
+      ? window.innerWidth + 20
+      : window.innerWidth / 1.37 + 30;
     this.doorOpenShadow.y = window.innerHeight / 2 + 10;
     this.doorOpenShadow.width = this.background.width / 4.1;
     this.doorOpenShadow.height = this.background.height / 1.55;
@@ -91,13 +97,17 @@ export default class Game extends Scene {
     // Handle
     this.handle.eventMode = "static";
     this.handle.cursor = "pointer";
-    this.handle.x = this.doorClosed.x - 20;
+    this.handle.x = this.isMobile
+      ? this.doorClosed.x - 10
+      : this.doorClosed.x - 20;
     this.handle.y = this.doorClosed.y;
     this.handle.width = this.background.width / 9;
     this.handle.height = this.background.height / 4;
 
     // Handle shadow
-    this.handleShadow.x = this.doorClosed.x - 15;
+    this.handleShadow.x = this.isMobile
+      ? this.doorClosed.x - 5
+      : this.doorClosed.x - 15;
     this.handleShadow.y = this.doorClosed.y + 10;
     this.handleShadow.width = this.background.width / 9;
     this.handleShadow.height = this.background.height / 4;
@@ -105,8 +115,12 @@ export default class Game extends Scene {
     // Timer
     this.timerText.x = window.innerWidth / 2 - this.doorClosed.width / 1.6;
     this.timerText.y = window.innerHeight / 2 - this.doorClosed.height / 10;
-    this.timerText.width = window.innerWidth / 35;
-    this.timerText.height = window.innerHeight / 30;
+    this.timerText.width = this.isMobile
+      ? window.innerWidth / 20
+      : window.innerWidth / 35;
+    this.timerText.height = this.isMobile
+      ? window.innerHeight / 40
+      : window.innerHeight / 30;
 
     this.addChild(
       this.background,
@@ -283,6 +297,8 @@ export default class Game extends Scene {
   onResize(width: number, height: number) {
     this.updateInteractions();
 
+    const isMobile = height > width;
+
     if (this.background) {
       this.background.resize(width, height);
     }
@@ -296,7 +312,9 @@ export default class Game extends Scene {
     }
 
     if (this.handle) {
-      this.handle.x = this.doorClosed.x - 20;
+      this.handle.x = isMobile
+        ? this.doorClosed.x - 10
+        : this.doorClosed.x - 20;
       this.handle.y = this.doorClosed.y;
       this.handle.width = this.background.width / 9;
       this.handle.height = this.background.height / 4;
@@ -304,7 +322,9 @@ export default class Game extends Scene {
     }
 
     if (this.handleShadow) {
-      this.handleShadow.x = this.doorClosed.x - 15;
+      this.handleShadow.x = isMobile
+        ? this.doorClosed.x - 5
+        : this.doorClosed.x - 15;
       this.handleShadow.y = this.doorClosed.y + 10;
       this.handleShadow.width = this.background.width / 9;
       this.handleShadow.height = this.background.height / 4;
@@ -312,7 +332,7 @@ export default class Game extends Scene {
     }
 
     if (this.doorOpen) {
-      this.doorOpen.x = width / 1.37 + 10;
+      this.doorOpen.x = isMobile ? width : width / 1.37 + 10;
       this.doorOpen.y = height / 2 - 10;
       this.doorOpen.width = this.background.width / 4.5;
       this.doorOpen.height = this.background.height / 1.55;
@@ -320,7 +340,7 @@ export default class Game extends Scene {
     }
 
     if (this.doorOpenShadow) {
-      this.doorOpenShadow.x = width / 1.37 + 30;
+      this.doorOpenShadow.x = isMobile ? width + 20 : width / 1.37 + 30;
       this.doorOpenShadow.y = height / 2 + 10;
       this.doorOpenShadow.width = this.background.width / 4.1;
       this.doorOpenShadow.height = this.background.height / 1.55;
@@ -330,8 +350,8 @@ export default class Game extends Scene {
     if (this.timerText) {
       this.timerText.x = width / 2 - this.doorClosed.width / 1.6;
       this.timerText.y = height / 2 - this.doorClosed.height / 10;
-      this.timerText.width = width / 35;
-      this.timerText.height = height / 30;
+      this.timerText.width = isMobile ? width / 20 : width / 35;
+      this.timerText.height = isMobile ? height / 40 : height / 30;
       animateOnResize(this.timerText);
     }
 

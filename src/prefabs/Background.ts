@@ -25,14 +25,7 @@ export default class Background extends Container {
     const texture = Texture.from(this.config.asset);
     const backgroundSprite = new Sprite(texture);
 
-    const scaleFactorWidth = window.innerWidth / backgroundSprite.texture.width;
-    const scaleFactorHeight =
-      window.innerHeight / backgroundSprite.texture.height;
-    const scaleFactor = Math.max(scaleFactorWidth, scaleFactorHeight);
-
-    backgroundSprite.width = window.innerWidth;
-    backgroundSprite.height = window.innerHeight;
-    backgroundSprite.scale.set(scaleFactor);
+    this.setDimentions(backgroundSprite, window.innerWidth, window.innerHeight);
 
     backgroundSprite.position.set(
       window.innerWidth / 2,
@@ -45,16 +38,26 @@ export default class Background extends Container {
     this.addChild(backgroundSprite);
   }
 
-  resize(width: number, height: number) {
-    for (const layer of this.backgroundSprites) {
-      const scaleFactorWidth = width / layer.texture.width;
-      const scaleFactorHeight = height / layer.texture.height;
+  setDimentions(sprite: Sprite, windowWidth: number, windowHeight: number) {
+    if (windowHeight > windowWidth) {
+      const scaleFactor = windowWidth / sprite.texture.width;
+      sprite.width = windowWidth;
+      sprite.height = sprite.texture.height * scaleFactor;
+      sprite.scale.set(scaleFactor * 2);
+    } else {
+      const scaleFactorWidth = windowWidth / sprite.texture.width;
+      const scaleFactorHeight = windowHeight / sprite.texture.height;
       const scaleFactor = Math.max(scaleFactorWidth, scaleFactorHeight);
 
-      layer.width = width;
-      layer.height = height;
-      layer.scale.set(scaleFactor);
+      sprite.width = windowWidth;
+      sprite.height = windowHeight;
+      sprite.scale.set(scaleFactor);
+    }
+  }
 
+  resize(width: number, height: number) {
+    for (const layer of this.backgroundSprites) {
+      this.setDimentions(layer, width, height);
       layer.position.set(width / 2, height / 2);
 
       gsap.to(layer, {
