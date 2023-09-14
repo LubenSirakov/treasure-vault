@@ -1,17 +1,17 @@
 import { Container, Sprite, Texture } from "pixi.js";
 import { centerObjects } from "../utils/misc";
 
-export type VaultConfig = {
+export type VaultElementConfig = {
   asset: string;
 };
 
-export class Vault extends Container {
-  name = "Vault";
+export class VaultElement extends Container {
+  name = "VaultElement";
 
   asset: string = "";
 
   constructor(
-    protected config: VaultConfig = {
+    protected config: VaultElementConfig = {
       asset: "",
     }
   ) {
@@ -25,10 +25,10 @@ export class Vault extends Container {
   init() {
     const texture = Texture.from(this.config.asset);
 
-    const vaultSprite = new Sprite(texture);
+    const vaultElementSprite = new Sprite(texture);
 
-    vaultSprite.anchor.set(0.5);
+    vaultElementSprite.anchor.set(0.5);
 
-    this.addChild(vaultSprite);
+    this.addChild(vaultElementSprite);
   }
 }

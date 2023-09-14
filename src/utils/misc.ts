@@ -1,6 +1,6 @@
 import { DisplayObject, Sprite, Text } from "pixi.js";
 import gsap from "gsap";
-import { Vault } from "../prefabs/Vault";
+import { VaultElement } from "../prefabs/VaultElement";
 import Background from "../prefabs/Background";
 
 export function centerObjects(...toCenter: DisplayObject[]) {
@@ -32,7 +32,7 @@ export function getEntries<T extends object>(obj: T) {
   return Object.entries(obj) as Entries<T>;
 }
 
-export function animateOnResize(element: Vault | Background | Text) {
+export function animateOnResize(element: VaultElement | Background | Text) {
   gsap.to(element, {
     duration: 0.25,
     width: element.width,

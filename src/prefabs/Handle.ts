@@ -1,18 +1,18 @@
 import { Sounds } from "./Sounds";
-import { Vault } from "./Vault";
+import { VaultElement } from "./VaultElement";
 import gsap from "gsap";
 import { centerObjects } from "../utils/misc";
 
-export type HandleConfig = {
+export type VaultElementConfig = {
   asset: string;
 };
 
-export class Handle extends Vault {
+export class Handle extends VaultElement {
   name = "Handle";
 
   private sounds: Sounds;
 
-  constructor(config: HandleConfig) {
+  constructor(config: VaultElementConfig) {
     super(config);
 
     this.sounds = new Sounds();

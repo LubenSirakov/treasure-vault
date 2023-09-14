@@ -7,7 +7,7 @@ import { generateVaultCombination } from "../utils/combinationGenerator";
 import { Blink } from "../prefabs/Blink";
 import { Timer } from "../utils/Timer";
 import { Sounds } from "../prefabs/Sounds";
-import { Vault } from "../prefabs/Vault";
+import { VaultElement } from "../prefabs/VaultElement";
 import { animateOnResize } from "../utils/misc";
 
 type CombinationPair = {
@@ -18,9 +18,9 @@ type CombinationPair = {
 export default class Game extends Scene {
   name = "Game";
 
-  private doorClosed!: Vault;
-  private doorOpen!: Vault;
-  private doorOpenShadow!: Vault;
+  private doorClosed!: VaultElement;
+  private doorOpen!: VaultElement;
+  private doorOpenShadow!: VaultElement;
   private handle!: Handle;
   private handleShadow!: Handle;
   private background!: Background;
@@ -44,11 +44,11 @@ export default class Game extends Scene {
 
   load() {
     this.background = new Background(config.backgrounds.vault);
-    this.doorClosed = new Vault(config.vault.closedDoor);
-    this.doorOpen = new Vault(config.vault.openedDoor);
-    this.doorOpenShadow = new Vault(config.vault.doorOpenShadow);
-    this.handle = new Handle(config.vault.handle);
-    this.handleShadow = new Handle(config.vault.handleShadow);
+    this.doorClosed = new VaultElement(config.vaultElements.closedDoor);
+    this.doorOpen = new VaultElement(config.vaultElements.openedDoor);
+    this.doorOpenShadow = new VaultElement(config.vaultElements.doorOpenShadow);
+    this.handle = new Handle(config.vaultElements.handle);
+    this.handleShadow = new Handle(config.vaultElements.handleShadow);
 
     this.timerText = new Text();
     this.sounds = new Sounds();
