@@ -8,7 +8,6 @@ import { Blink } from "../prefabs/Blink";
 import { Timer } from "../utils/Timer";
 import { Sounds } from "../prefabs/Sounds";
 import { Vault } from "../prefabs/Vault";
-import gsap from "gsap";
 import { animateOnResize } from "../utils/misc";
 
 type CombinationPair = {
